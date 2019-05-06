@@ -1,41 +1,36 @@
 package com.tensor.api.org.service.hbase;
 
-
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tensor.api.org.enpity.News;
 import com.tensor.api.org.enpity.ResultData;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 public interface HBaseNewsService {
 
-    /**
-     * 根据传入的参数将新闻插入数据库 返回是否成功
-     *
-     * @param news
-     * @return
-     */
-    Mono<ResultData<Boolean>> putNews(News news);
 
     /**
      * 读取全部新闻
      *
      * @return
      */
-    Mono<ResultData<JsonObject>> getAllNews();
+    Mono<ResultData<List>> getAllNews();
 
     /**
      * 读取全部作者 返回 行键-作者
      *
      * @return
      */
-    Mono<ResultData<JsonObject>> getAllAuthor();
+    Mono<ResultData<JsonArray>> getAllAuthor();
 
     /**
      * 读取全部标题 返回 行键-标题
      *
      * @return
      */
-    Mono<ResultData<JsonObject>> getAllTitle();
+    Mono<ResultData<JsonArray>> getAllTitle();
 
     /**
      * 根据行键读取新闻 返回对应新闻
@@ -43,7 +38,7 @@ public interface HBaseNewsService {
      * @param rowKey
      * @return
      */
-    Mono<ResultData<JsonObject>> getNewsByRowKey(String rowKey);
+    Mono<ResultData<JsonArray>> getNewsByRowKey(String rowKey);
 
     /**
      * 根据标题读取新闻  返回对应新闻
@@ -51,7 +46,7 @@ public interface HBaseNewsService {
      * @param newTitle
      * @return
      */
-    Mono<ResultData<JsonObject>> getNewsByTitle(String newTitle);
+    Mono<ResultData<JsonArray>> getNewsByTitle(String newTitle);
 
     /**
      * 根据作者读新闻    返回对应新闻
@@ -59,7 +54,7 @@ public interface HBaseNewsService {
      * @param author
      * @return
      */
-    Mono<ResultData<JsonObject>> getNewsByAuthor(String author);
+    Mono<ResultData<JsonArray>> getNewsByAuthor(String author);
 
     /**
      * 根据分类读新闻
@@ -67,5 +62,5 @@ public interface HBaseNewsService {
      * @param newType
      * @return
      */
-    Mono<ResultData<JsonObject>> getNewsByType(String newType);
+    Mono<ResultData<JsonArray>> getNewsByType(String newType);
 }

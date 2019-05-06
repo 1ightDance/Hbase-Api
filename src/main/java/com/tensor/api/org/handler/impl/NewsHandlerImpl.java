@@ -1,12 +1,13 @@
 package com.tensor.api.org.handler.impl;
 
-import com.tensor.api.org.config.schedule.Schedule;
 import com.tensor.api.org.enpity.News;
-import com.tensor.api.org.enpity.ResultData;
+import com.tensor.api.org.enpity.mq.Message;
 import com.tensor.api.org.handler.NewsHandler;
 import com.tensor.api.org.service.hbase.HBaseNewsService;
+import com.tensor.api.org.service.mq.ProducerService;
+import com.tensor.api.org.util.MessageUtils;
 import com.tensor.api.org.util.ResponseRender;
-import com.tensor.api.org.util.alog.SimHashAlogUtil;
+import com.tensor.api.org.util.alog.SimHashAlogUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -25,11 +26,16 @@ public class NewsHandlerImpl implements NewsHandler {
     @Autowired
     private HBaseNewsService hBaseNewsService;
 
+    @Autowired
+    private ProducerService producerService;
+
     @Override
     public Mono<ServerResponse> saveNew(ServerRequest request) {
-        return request.bodyToMono(News.class).map(SimHashAlogUtil::simHash)
-                .publishOn(Schedulers.fromExecutor(Schedule.DB))
-                .flatMap(newsBean -> ResponseRender.render(hBaseNewsService.putNews(newsBean)))
+        return request.bodyToMono(News.class)
+                .map(SimHashAlogUtils::nlp)
+                .map(newBean -> Message.buildMessage(MessageUtils.MQ_TOPIC_STORE, newBean))
+                .map(message -> producerService.publish(message))
+                .flatMap(ResponseRender::render)
                 .subscribeOn(Schedulers.elastic());
     }
 
